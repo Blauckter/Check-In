@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Cauca Viejo - Sistema de Gestión</title>
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <!-- html2canvas para exportar imágenes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- Toastify para notificaciones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.js"></script>
+</head>
+
+<body>
+  <!-- Header con toggle de tema -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <img src="img/logo.jpg" alt="Hotel Cauca Viejo" class="header-logo">
+        <h1>Hotel Cauca Viejo</h1>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" class="btn-icon" title="Cambiar tema">
+          🌙
+        </button>
+        <button id="stats-toggle" class="btn-icon" title="Ver estadísticas">
+          📊
+        </button>
+        <button id="history-toggle" class="btn-icon" title="Ver historial">
+          📅
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- PANEL DE ESTADÍSTICAS -->
+    <div id="stats-panel" class="stats-panel" style="display:none;">
+      <h2>📊 Estadísticas del Hotel</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-ocupacion">0%</div>
+          <div class="stat-label">Ocupación Hoy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-checkins">0</div>
+          <div class="stat-label">Check-Ins</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-checkouts">0</div>
+          <div class="stat-label">Check-Outs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-huespedes">0</div>
+          <div class="stat-label">Huéspedes (PAX)</div>
+        </div>
+      </div>
+
+      <div class="charts-container">
+        <div class="chart-box">
+          <h3>Ocupación Últimos 7 Días</h3>
+          <canvas id="occupancyChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Habitaciones Más Solicitadas</h3>
+          <canvas id="roomsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL DE HISTORIAL -->
+    <div id="history-panel" class="history-panel" style="display:none;">
+      <h2>📅 Historial de Registros</h2>
+      <div class="form-group">
+        <label for="date-selector">Seleccionar fecha:</label>
+        <input type="date" id="date-selector">
+        <button id="load-date" class="btn btn-primary">Cargar</button>
+      </div>
+      <div id="history-output" class="history-output">
+        Selecciona una fecha para ver los registros
+      </div>
+      <div class="form-actions">
+        <button id="export-all" class="btn btn-secondary">📦 Exportar Todo</button>
+        <button id="import-data" class="btn btn-secondary">📥 Importar Datos</button>
+        <input type="file" id="file-input" accept=".json" style="display:none;">
+      </div>
+    </div>
+
+    <!-- BÚSQUEDA -->
+    <div class="search-section form-card">
+      <h2>🔍 Búsqueda</h2>
+      <div class="search-controls">
+        <input type="text" id="search-input" placeholder="Buscar por habitación o huésped...">
+        <button id="search-btn" class="btn btn-primary">Buscar</button>
+        <button id="clear-search" class="btn btn-secondary">Limpiar</button>
+      </div>
+      <div id="search-results"></div>
+    </div>
+
+    <!-- FORMULARIO DE REGISTRO -->
+    <div class="form-section">
+      <h2 class="title">✨ NUEVO REGISTRO DE HABITACIONES</h2>
+
+      <form id="checkin-form" class="form-card">
+        <!-- Selector de sección -->
+        <div class="form-group">
+          <label for="selector-seccion">¿Qué quieres agregar?</label>
+          <select id="selector-seccion">
+            <option value="">-- Selecciona una opción --</option>
+            <option value="checkin">✅ Check-In</option>
+            <option value="sequeda">🏠 Se Queda</option>
+            <option value="checkout">🚪 Check-Out</option>
+          </select>
+        </div>
+
+        <!-- CHECK-IN -->
+        <div id="section-checkin" class="seccion-form" style="display:none;">
+          <h3>✅ Check-In</h3>
+          <div class="form-group">
+            <label for="habitacion">Habitación: *</label>
+            <input list="habitaciones" id="habitacion" placeholder="Escriba o seleccione">
+            <datalist id="habitaciones">
+              <option value="Jericó">
+              <option value="Santa Barbara">
+              <option value="Concordia">
+              <option value="Jardín">
+              <option value="Caramanta">
+              <option value="Titiribi">
+              <option value="Angelopolis">
+              <option value="Tamesis">
+              <option value="Hispania">
+              <option value="Montebello">
+              <option value="La Pintada">
+              <option value="Fredonia">
+              <option value="Betulia">
+              <option value="Betania">
+              <option value="Amagá">
+              <option value="Ciudad Bolivar">
+              <option value="Salgar">
+              <option value="Urrao">
+              <option value="Andes">
+              <option value="Anzá">
+              <option value="Pueblorrico">
+              <option value="Bolombolo">
+              <option value="Tarso">
+              <option value="Venecia">
+              <option value="Valparaíso">
+            </datalist>
+            <span class="availability-indicator" id="room-available"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="huesped">Nombre huésped: *</label>
+            <input type="text" id="huesped" placeholder="Ej: Juan Pérez">
+          </div>
+
+          <div class="form-group">
+            <label for="pax">Número de personas (PAX): *</label>
+            <input type="number" id="pax" min="1" max="10">
+          </div>
+
+          <div class="form-group">
+            <label for="extra">Petición especial:</label>
+            <input type="text" id="extra" placeholder="Decoración, comida especial...">
+          </div>
+        </div>
+
+        <!-- SE QUEDA -->
+        <div id="section-sequeda" class="seccion-form" style="display:none;">
+          <h3>🏠 Se Queda</h3>
+          <div class="form-group">
+            <label for="sequeda">Habitación: *</label>
+            <input list="habitaciones" id="sequeda" placeholder="Escriba o seleccione">
+          </div>
+        </div>
+
+        <!-- CHECK-OUT -->
+        <div id="section-checkout" class="seccion-form" style="display:none;">
+          <h3>🚪 Check-Out</h3>
+          <div class="form-group">
+            <label for="checkout">Habitación: *</label>
+            <input list="habitaciones" id="checkout" placeholder="Escriba o seleccione">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          <button type="reset" class="btn btn-secondary">🔄 Limpiar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- LISTADO -->
+    <div id="checkin-list" class="form-card">
+      <img src="img/logo.jpg" alt="Hotel de Cauca Viejo" class="report-logo">
+
+      <h2>📋 Reporte del Día</h2>
+      <p class="fecha">Fecha: <strong id="fecha-hoy"></strong></p>
+
+      <div id="output">Aquí aparecerán los registros...</div>
+
+      <div class="form-actions">
+        <button id="btn-image" class="btn btn-secondary">🖼️ Copiar como Imagen</button>
+        <button id="btn-download" class="btn btn-primary">📥 Descargar TXT</button>
+        <button id="btn-download-pdf" class="btn btn-primary">📄 Descargar PDF</button>
+        <button id="btn-print" class="btn btn-secondary">🖨️ Imprimir</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+
+</html>
